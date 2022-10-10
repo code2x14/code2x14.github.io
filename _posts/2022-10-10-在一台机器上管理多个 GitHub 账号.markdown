@@ -1,0 +1,133 @@
+---
+layout: post
+title:  在一台机器上管理多个 GitHub 账号
+date:   2022-10-10 12:30:41 +0800
+categories: jekyll update
+---
+[How to manage multiple GitHub accounts on a single machine with SSH keys](https://www.freecodecamp.org/news/manage-multiple-github-accounts-the-ssh-way-2dadc30ccaca/)
+
+[toc]
+
+# 生成 SSH key
+
+首先查看 `~/.ssh` 目录下有哪些已生成的 SSH key：
+
+```bash
+$ ls -al ~/.ssh
+```
+
+
+
+生成一个 SSH key：
+
+```bash
+$ ssh-keygen -t rsa
+```
+
+该命令会同时生一个密钥 `id_rsa` 和一个公钥 `id_rsa.pub`。
+
+
+
+使用标签 `email@work_mail.com` 生成名为 `id_rsa_work_user1` 的 SSH key：
+
+```bash
+$ ssh-keygen -t rsa -C "email@work_mail.com" -f "id_rsa_work_user1"
+```
+
+
+
+此时，我们有了两个密钥两个公钥：
+
+```text
+~/.ssh/id_rsa
+~/.ssh/id_rsa.pub
+~/.ssh/id_rsa_work_user1
+~/.ssh/id_rsa_work_user1.pub
+```
+
+
+
+# 添加 SSH key 到 GitHub 账户
+
+略。
+
+# 注册生成的 SSH key 到 SSH agent
+
+```bash
+$ ssh-add ~/.ssh/id_rsa
+$ ssh-add ~/.ssh/id_rsa_work_user1
+```
+
+检查已注册的 SSH key：
+
+```bash
+$ ssh-add -l
+```
+
+移除全部：
+
+```bash
+$ ssh-add -D
+```
+
+# 创建 SSH 配置文件
+
+```bash
+$ cd ~/.ssh/
+$ touch config           // Creates the file if not exists
+$ code config            // Opens the file in VS code, use any editor
+```
+
+为相关账户添加配置：
+
+```text
+# Personal account, - the default config
+Host github.com
+   HostName github.com
+   User git
+   IdentityFile ~/.ssh/id_rsa
+   
+# Work account-1
+Host github.com-work_user1    
+   HostName github.com
+   User git
+   IdentityFile ~/.ssh/id_rsa_work_user1
+```
+
+
+
+# 为某个仓库配置 Git 提交信息
+
+```bash
+$ git config user.name "User 1"   // Updates git config user name
+$ git config user.email "user1@workMail.com"
+```
+
+
+
+# 克隆工作账户新仓库
+
+对于工作账户，如果新仓库地址为：
+
+```
+git clone git@github.com:personal_account_name/repo_name.git
+```
+
+为了后续可以正常推送，应使用：
+
+```
+git clone git@github.com-work_user1:personal_account_name/repo_name.git
+```
+
+
+
+# 配置工作账户已有仓库
+
+对于工作账户已有仓库，应修改其 git 地址：
+
+```bash
+$ git remote set-url origin git@github.com-worker_user1:worker_user1/repo_name.git
+```
+
+
+
