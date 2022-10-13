@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  英语
+title:  English Learning
 date:   2022-10-13
 categories: english vocabulary
 ---
